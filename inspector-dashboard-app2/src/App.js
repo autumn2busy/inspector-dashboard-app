@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Briefcase, FileText, Clipboard, Loader2, CheckCircle, AlertTriangle, UploadCloud, Trash2, ChevronDown, Sparkles, HelpCircle, X } from 'lucide-react';
+import { User, Briefcase, FileText, Clipboard, Loader2, CheckCircle, AlertTriangle, UploadCloud, Trash2, Sparkles, HelpCircle, X } from 'lucide-react';
 
 // Modal Component for AI features
 const AIFeatureModal = ({ title, content, isLoading, onClose, onCopy }) => {
