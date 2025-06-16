@@ -1,5 +1,43 @@
 import React, { useState } from 'react';
-import { User, Briefcase, FileText, Clipboard, Loader2, CheckCircle, AlertTriangle, UploadCloud, Trash2, Sparkles, HelpCircle, X } from 'lucide-react';
+import { User, Briefcase, FileText, Clipboard, Loader2, CheckCircle, AlertTriangle, UploadCloud, Trash2, Sparkles, HelpCircle, X, ArrowUp } from 'lucide-react';
+
+// Scroll to Top Component
+const ScrollToTop = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleVisibility = () => {
+    if (window.pageYOffset > 300) {
+      setIsVisible(true);
+    } else {
+      setIsVisible(false);
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  React.useEffect(() => {
+    window.addEventListener('scroll', toggleVisibility);
+    return () => window.removeEventListener('scroll', toggleVisibility);
+  }, []);
+
+  return (
+    <div className="fixed bottom-8 right-8 z-50">
+      {isVisible && (
+        <button
+          onClick={scrollToTop}
+          className="bg-teal-600 hover:bg-teal-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+        >
+          <ArrowUp className="h-6 w-6" />
+        </button>
+      )}
+    </div>
+  );
+};
 
 // Modal Component for AI features
 const AIFeatureModal = ({ title, content, isLoading, onClose, onCopy }) => {
@@ -12,37 +50,42 @@ const AIFeatureModal = ({ title, content, isLoading, onClose, onCopy }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-                <div className="flex justify-between items-center p-4 border-b">
-                    <h3 className="text-xl font-semibold text-gray-800 flex items-center">
-                        <Sparkles className="h-6 w-6 mr-2 text-indigo-500" />
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+                <div className="flex justify-between items-center p-6 border-b border-gray-200">
+                    <h3 className="text-2xl font-bold text-gray-800 flex items-center">
+                        <Sparkles className="h-7 w-7 mr-3 text-teal-600" />
                         {title}
                     </h3>
-                    <button onClick={onClose} className="p-1 rounded-full text-gray-400 hover:bg-gray-200 hover:text-gray-600">
+                    <button onClick={onClose} className="p-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
                         <X className="h-6 w-6" />
                     </button>
                 </div>
-                <div className="p-6 overflow-y-auto">
+                <div className="p-6 overflow-y-auto flex-1">
                     {isLoading ? (
-                        <div className="flex flex-col items-center justify-center space-y-3 min-h-[200px]">
-                            <Loader2 className="animate-spin h-10 w-10 text-indigo-600" />
-                            <p className="text-gray-600">Generating content...</p>
+                        <div className="flex flex-col items-center justify-center space-y-4 min-h-[300px]">
+                            <Loader2 className="animate-spin h-12 w-12 text-teal-600" />
+                            <p className="text-gray-600 text-lg">Generating professional content...</p>
+                            <div className="w-64 bg-gray-200 rounded-full h-2">
+                                <div className="bg-gradient-to-r from-teal-500 to-blue-600 h-2 rounded-full animate-pulse w-1/2"></div>
+                            </div>
                         </div>
                     ) : (
-                        <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans">{content}</pre>
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">{content}</pre>
+                        </div>
                     )}
                 </div>
-                <div className="flex justify-end items-center p-4 border-t space-x-3">
+                <div className="flex justify-end items-center p-6 border-t border-gray-200 space-x-4">
                     <button 
                         onClick={handleCopy} 
                         disabled={isLoading || !content}
-                        className="flex items-center justify-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all"
+                        className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-teal-600 to-blue-600 text-white font-semibold rounded-lg shadow-md hover:from-teal-700 hover:to-blue-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all duration-200"
                     >
                         {copied ? <CheckCircle className="mr-2 h-5 w-5 text-green-400" /> : <Clipboard className="mr-2 h-5 w-5" />}
                         {copied ? 'Copied!' : 'Copy Text'}
                     </button>
-                    <button onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2">
+                    <button onClick={onClose} className="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200">
                         Close
                     </button>
                 </div>
@@ -417,189 +460,252 @@ export default function App() {
     
     if (isLoading && currentView !== 'display') { 
         return (
-          <div className="flex flex-col items-center justify-center p-8 space-y-4 bg-white rounded-lg shadow-xl min-h-[400px]">
-            <Loader2 className="animate-spin h-12 w-12 text-indigo-600" />
-            <p className="text-gray-600 text-lg">Analyzing your resume and generating content...</p>
+          <div className="min-h-screen bg-gradient-to-br from-teal-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl p-12 max-w-md w-full text-center">
+              <div className="relative mb-8">
+                <Loader2 className="animate-spin h-16 w-16 text-teal-600 mx-auto" />
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-teal-500 to-blue-600 opacity-20 animate-pulse"></div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Creating Your Professional Resume</h3>
+              <p className="text-gray-600 text-lg mb-6">Our AI is analyzing your experience and tailoring it for inspector roles...</p>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div className="bg-gradient-to-r from-teal-500 to-blue-600 h-3 rounded-full animate-pulse" style={{width: '70%'}}></div>
+              </div>
+              <p className="text-sm text-gray-500 mt-4">This usually takes 30-60 seconds</p>
+            </div>
           </div>
         ); 
     }
 
     if (currentView === 'display' && generatedResume) {
       return (
-        <div className="p-4 sm:p-6 lg:p-8 bg-white rounded-lg shadow-xl">
-          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2 text-center">Your Tailored Inspector Resume</h2>
-          {jobDescription.trim() && <p className="text-sm text-center text-gray-500 mb-6">Optimized for: {getEffectiveTargetRole()}</p>}
-          
-          <div className="mb-6 p-4 border border-gray-300 rounded-md bg-gray-50 max-h-[60vh] overflow-y-auto">
-            <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans">{generatedResume}</pre>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-8">
-            <button 
-              onClick={() => { 
-                if(handleCopyToClipboard(generatedResume)) { 
-                  setCopied(true); 
-                  setTimeout(()=>setCopied(false), 2000)
-                } 
-              }}
-              className="w-full sm:w-auto flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 ease-in-out">
-              {copied ? (
-                <CheckCircle className="mr-2 h-5 w-5 text-green-400" />
-              ) : (
-                <Clipboard className="mr-2 h-5 w-5" />
+        <div className="min-h-screen bg-gradient-to-br from-teal-50 via-blue-50 to-indigo-100 py-8 px-4">
+          <div className="max-w-4xl mx-auto">
+            {/* Header Section */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-teal-600 to-blue-600 rounded-full mb-4">
+                <CheckCircle className="h-8 w-8 text-white" />
+              </div>
+              <h2 className="text-4xl font-bold text-gray-800 mb-3">Your Professional Inspector Resume</h2>
+              {jobDescription.trim() && (
+                <div className="inline-flex items-center bg-teal-100 text-teal-800 px-4 py-2 rounded-full text-sm font-medium">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Optimized for: {getEffectiveTargetRole()}
+                </div>
               )}
-              {copied ? 'Copied!' : 'Copy to Clipboard'}
-            </button>
-            <button onClick={() => setCurrentView('form')} className="w-full sm:w-auto px-6 py-3 bg-gray-300 text-gray-700 font-semibold rounded-md shadow-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-150 ease-in-out">
-              Generate New Resume
-            </button>
-          </div>
+            </div>
+            
+            {/* Resume Display */}
+            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden mb-8">
+              <div className="bg-gradient-to-r from-teal-600 to-blue-600 px-6 py-4">
+                <h3 className="text-white text-xl font-semibold">Your Tailored Resume</h3>
+              </div>
+              <div className="p-8">
+                <div className="bg-gray-50 rounded-xl p-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                  <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">{generatedResume}</pre>
+                </div>
+              </div>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <button 
+                onClick={() => { 
+                  if(handleCopyToClipboard(generatedResume)) { 
+                    setCopied(true); 
+                    setTimeout(()=>setCopied(false), 2000)
+                  } 
+                }}
+                className="flex items-center justify-center px-6 py-4 bg-gradient-to-r from-teal-600 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:from-teal-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-200">
+                {copied ? (
+                  <>
+                    <CheckCircle className="mr-3 h-5 w-5 text-green-300" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Clipboard className="mr-3 h-5 w-5" />
+                    Copy Resume
+                  </>
+                )}
+              </button>
+              
+              <button 
+                onClick={() => setCurrentView('form')} 
+                className="flex items-center justify-center px-6 py-4 bg-gray-600 text-white font-semibold rounded-xl shadow-lg hover:bg-gray-700 transform hover:scale-105 transition-all duration-200">
+                <Briefcase className="mr-3 h-5 w-5" />
+                Create New
+              </button>
+              
+              <button
+                onClick={() => {
+                  setIsLoadingAiFeature(true);
+                  setModalContent('coverLetter');
+                  handleGenerateCoverLetter();
+                }}
+                className="flex items-center justify-center px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:from-green-700 hover:to-emerald-700 transform hover:scale-105 transition-all duration-200">
+                <FileText className="mr-3 h-5 w-5" />
+                Cover Letter
+              </button>
+              
+              <button
+                onClick={() => {
+                  setIsLoadingAiFeature(true);
+                  setModalContent('interviewQuestions');
+                  handleGenerateInterviewQuestions();
+                }}
+                className="flex items-center justify-center px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:from-purple-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200">
+                <HelpCircle className="mr-3 h-5 w-5" />
+                Interview Prep
+              </button>
+            </div>
 
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
-            <button
-              onClick={() => {
-                setIsLoadingAiFeature(true);
-                setModalContent('coverLetter');
-                handleGenerateCoverLetter();
-              }}
-              className="w-full sm:w-auto flex items-center justify-center px-6 py-3 bg-green-600 text-white font-semibold rounded-md shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150 ease-in-out"
-            >
-              <FileText className="mr-2 h-5 w-5" />
-              Generate Cover Letter
-            </button>
-            <button
-              onClick={() => {
-                setIsLoadingAiFeature(true);
-                setModalContent('interviewQuestions');
-                handleGenerateInterviewQuestions();
-              }}
-              className="w-full sm:w-auto flex items-center justify-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-md shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-150 ease-in-out"
-            >
-              <HelpCircle className="mr-2 h-5 w-5" />
-              Generate Interview Questions
-            </button>
+            {/* Success Message */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
+              <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-3" />
+              <h4 className="text-lg font-semibold text-green-800 mb-2">🎉 Resume Generated Successfully!</h4>
+              <p className="text-green-700">Your resume has been optimized for inspector roles and is ready to help you land your next opportunity.</p>
+            </div>
           </div>
         </div>
       );
     }
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 sm:p-6 lg:p-8">
-        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-xl p-6 sm:p-8">
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <div className="bg-indigo-100 p-3 rounded-full">
-                <Briefcase className="h-8 w-8 text-indigo-600" />
-              </div>
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-blue-50 to-indigo-100 py-8 px-4">
+        <div className="max-w-2xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-teal-600 to-blue-600 rounded-full mb-6 shadow-xl">
+              <Briefcase className="h-10 w-10 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Inspector Resume Builder</h1>
-            <p className="text-gray-600">Transform your experience into an inspector-focused resume</p>
+            <h1 className="text-5xl font-bold text-gray-800 mb-4">Inspector Resume Builder</h1>
+            <p className="text-xl text-gray-600 mb-2">Transform your experience into an inspector-focused resume</p>
+            <p className="text-sm text-teal-600 font-medium">🚨 Get hired 10X faster with AI-optimized resumes</p>
           </div>
 
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md flex items-start">
-              <AlertTriangle className="h-5 w-5 text-red-400 mr-3 mt-0.5 flex-shrink-0" />
-              <p className="text-red-700 text-sm">{error}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* User Information */}
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="userName" className="block text-sm font-medium text-gray-700 mb-2">
-                  <User className="inline h-4 w-4 mr-1" />
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  id="userName"
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Enter your full name"
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="userContact" className="block text-sm font-medium text-gray-700 mb-2">
-                  Contact Information *
-                </label>
-                <textarea
-                  id="userContact"
-                  value={userContact}
-                  onChange={(e) => setUserContact(e.target.value)}
-                  rows="2"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Email, phone number, LinkedIn, address"
-                  required
-                />
-              </div>
+          {/* Main Form Container */}
+          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-teal-600 to-blue-600 px-8 py-6">
+              <h2 className="text-2xl font-bold text-white">Build Your Professional Resume</h2>
+              <p className="text-teal-100 mt-2">Fill out the form below to create a tailored resume for inspector roles</p>
             </div>
 
-            {/* Target Role Selection */}
-            <div>
-              <label htmlFor="targetRole" className="block text-sm font-medium text-gray-700 mb-2">
-                <Briefcase className="inline h-4 w-4 mr-1" />
-                Target Inspector Role *
-              </label>
-              <select
-                id="targetRole"
-                value={targetRole}
-                onChange={(e) => setTargetRole(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                {inspectorRoles.map((role, index) => (
-                  <option key={index} value={role}>{role}</option>
-                ))}
-              </select>
-              
-              {targetRole === "Other (Specify)" && (
-                <input
-                  type="text"
-                  value={customTargetRole}
-                  onChange={(e) => setCustomTargetRole(e.target.value)}
-                  className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Specify your target inspector role"
-                  required
-                />
+            <div className="p-8">
+              {error && (
+                <div className="mb-8 p-4 bg-red-50 border-l-4 border-red-400 rounded-lg flex items-start">
+                  <AlertTriangle className="h-6 w-6 text-red-400 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="text-red-800 font-semibold">Error</h4>
+                    <p className="text-red-700 text-sm mt-1">{error}</p>
+                  </div>
+                </div>
               )}
-            </div>
 
-            {/* Job Description (Optional) */}
-            <div>
-              <label htmlFor="jobDescription" className="block text-sm font-medium text-gray-700 mb-2">
-                <FileText className="inline h-4 w-4 mr-1" />
-                Job Description (Optional)
-              </label>
-              <textarea
-                id="jobDescription"
-                value={jobDescription}
-                onChange={(e) => setJobDescription(e.target.value)}
-                rows="4"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Paste the job description here to tailor your resume for specific requirements..."
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Including a job description will help tailor your resume with relevant keywords and requirements.
-              </p>
-            </div>
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Personal Information Section */}
+                <div className="space-y-6">
+                  <h3 className="text-lg font-semibold text-gray-800 border-b-2 border-teal-100 pb-2">Personal Information</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="userName" className="block text-sm font-medium text-gray-700 mb-2">
+                        <User className="inline h-4 w-4 mr-2" />
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        id="userName"
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                        placeholder="Enter your full name"
+                        required
+                      />
+                    </div>
 
-            {/* File Upload */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <UploadCloud className="inline h-4 w-4 mr-1" />
-                Upload Current Resume *
-              </label>
-              
-              {!fileName ? (
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                  <div className="space-y-1 text-center">
-                    <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
-                    <div className="flex text-sm text-gray-600">
-                      <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                        <span>Upload a file</span>
+                    <div>
+                      <label htmlFor="targetRole" className="block text-sm font-medium text-gray-700 mb-2">
+                        <Briefcase className="inline h-4 w-4 mr-2" />
+                        Target Inspector Role *
+                      </label>
+                      <select
+                        id="targetRole"
+                        value={targetRole}
+                        onChange={(e) => setTargetRole(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                      >
+                        {inspectorRoles.map((role, index) => (
+                          <option key={index} value={role}>{role}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {targetRole === "Other (Specify)" && (
+                    <div>
+                      <input
+                        type="text"
+                        value={customTargetRole}
+                        onChange={(e) => setCustomTargetRole(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                        placeholder="Specify your target inspector role"
+                        required
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label htmlFor="userContact" className="block text-sm font-medium text-gray-700 mb-2">
+                      Contact Information *
+                    </label>
+                    <textarea
+                      id="userContact"
+                      value={userContact}
+                      onChange={(e) => setUserContact(e.target.value)}
+                      rows="3"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors resize-none"
+                      placeholder="Email, phone number, LinkedIn, address"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Job Description Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800 border-b-2 border-teal-100 pb-2">Job Targeting (Optional)</h3>
+                  
+                  <div>
+                    <label htmlFor="jobDescription" className="block text-sm font-medium text-gray-700 mb-2">
+                      <FileText className="inline h-4 w-4 mr-2" />
+                      Job Description
+                    </label>
+                    <textarea
+                      id="jobDescription"
+                      value={jobDescription}
+                      onChange={(e) => setJobDescription(e.target.value)}
+                      rows="5"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors resize-none"
+                      placeholder="Paste the job description here to tailor your resume for specific requirements..."
+                    />
+                    <p className="mt-2 text-sm text-gray-500">
+                      💡 Including a job description will help tailor your resume with relevant keywords and requirements.
+                    </p>
+                  </div>
+                </div>
+
+                {/* File Upload Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-800 border-b-2 border-teal-100 pb-2">Current Resume</h3>
+                  
+                  {!fileName ? (
+                    <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-teal-400 transition-colors">
+                      <UploadCloud className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+                      <div className="text-lg text-gray-600 mb-2">Upload your current resume</div>
+                      <div className="text-sm text-gray-500 mb-4">Drag and drop or click to browse</div>
+                      <label htmlFor="file-upload" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-600 to-blue-600 text-white font-semibold rounded-lg cursor-pointer hover:from-teal-700 hover:to-blue-700 transition-all duration-200">
+                        <UploadCloud className="mr-2 h-5 w-5" />
+                        Choose File
                         <input 
                           id="file-upload" 
                           name="file-upload" 
@@ -610,47 +716,74 @@ export default function App() {
                           required
                         />
                       </label>
-                      <p className="pl-1">or drag and drop</p>
+                      <p className="text-xs text-gray-500 mt-3">Supports TXT, DOC, DOCX up to 10MB</p>
                     </div>
-                    <p className="text-xs text-gray-500">TXT, DOC, DOCX up to 10MB</p>
-                  </div>
+                  ) : (
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-6 flex items-center justify-between">
+                      <div className="flex items-center">
+                        <CheckCircle className="h-8 w-8 text-green-500 mr-4" />
+                        <div>
+                          <div className="font-semibold text-green-800">File uploaded successfully</div>
+                          <div className="text-sm text-green-600">{fileName}</div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removeUploadedFile}
+                        className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="mt-1 flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-md">
-                  <div className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
-                    <span className="text-sm text-green-700">File uploaded: {fileName}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={removeUploadedFile}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-            </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
-                  Generating Resume...
-                </>
-              ) : (
-                <>
-                  <Briefcase className="-ml-1 mr-3 h-5 w-5" />
-                  Generate Inspector Resume
-                </>
-              )}
-            </button>
-          </form>
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full flex justify-center items-center py-4 px-6 border border-transparent rounded-xl shadow-lg text-lg font-semibold text-white bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="animate-spin -ml-1 mr-3 h-6 w-6 text-white" />
+                      Generating Your Resume...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="-ml-1 mr-3 h-6 w-6" />
+                      Generate My Inspector Resume
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+          </div>
+
+          {/* Features Section */}
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-xl p-6 shadow-lg text-center">
+              <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="h-6 w-6 text-teal-600" />
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">AI-Powered</h3>
+              <p className="text-sm text-gray-600">Advanced AI analyzes your experience and optimizes for inspector roles</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-lg text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">ATS Optimized</h3>
+              <p className="text-sm text-gray-600">Passes applicant tracking systems with targeted keywords</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-lg text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <FileText className="h-6 w-6 text-green-600" />
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">Complete Package</h3>
+              <p className="text-sm text-gray-600">Get resume, cover letter, and interview prep in one tool</p>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -659,6 +792,7 @@ export default function App() {
   return (
     <div>
       {renderContent()}
+      <ScrollToTop />
       {modalContent && (
         <AIFeatureModal
           title={modalContent === 'coverLetter' ? 'Generated Cover Letter' : 'Interview Preparation Questions'}
@@ -671,6 +805,24 @@ export default function App() {
           onCopy={handleCopyToClipboard}
         />
       )}
+      
+      {/* Custom Scrollbar Styles */}
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #0d9488, #2563eb);
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #0f766e, #1d4ed8);
+        }
+      `}</style>
     </div>
   );
 }
